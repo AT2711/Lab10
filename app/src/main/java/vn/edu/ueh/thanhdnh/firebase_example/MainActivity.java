@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       etPhone.setText("");
     } else if (view.getId() == R.id.btShow) {
       Intent intent = new Intent(getBaseContext(), ShowDataActivity.class);
-      startActivity(intent);
+      startActivity(intent );
     }
   }
 }
