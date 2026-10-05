@@ -10,35 +10,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class UserViewAdapter extends RecyclerView.Adapter<UserViewHolder> {
+class ArticleViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
   private LayoutInflater mInflater;
-  private List<User> users;
+  private List<Article> articles;
 
-  public UserViewAdapter(Context context, List<User> users) {
+  public ArticleViewAdapter(Context context, List<Article> articles) {
     this.mInflater = LayoutInflater.from(context);
-    this.users = users;
+    this.articles = articles;
   }
 
-  public void update(List<User> users){
-    this.users = users;
+  public void update(List<Article> articles) {
+    this.articles = articles;
   }
 
   @NonNull
   @Override
-  public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+  public ArticleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     View customView = mInflater.inflate(R.layout.contact_list, parent, false);
-    return new UserViewHolder(customView, this);
+    return new ArticleViewHolder(customView, this);
   }
 
   @Override
-  public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-    User currentuser = users.get(position);
-    holder.getTxtName().setText(currentuser.getName());
-    holder.getTxtPhone().setText(currentuser.getPhone());
+  public void onBindViewHolder(@NonNull ArticleViewHolder holder, int position) {
+    Article article = articles.get(position);
+
+    holder.getTxtTitle().setText(article.getTitle());
+    holder.getTxtContent().setText(article.getContent());
   }
 
   @Override
   public int getItemCount() {
-    return users.size();
+    return articles.size();
   }
 }

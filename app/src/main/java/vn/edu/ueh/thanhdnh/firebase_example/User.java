@@ -1,42 +1,27 @@
 package vn.edu.ueh.thanhdnh.firebase_example;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Base64;
+class Article {
+  private String title;
+  private String content;
 
-public class User {
-  private String name;
-  private String phone;
-
-  public User(String name, String phone) {
-    this.name = name;
-    this.phone = phone;
+  public Article(String title, String content) {
+    this.title = title;
+    this.content = content;
   }
 
-  public String getName() {
-    return name;
+  public String getTitle() {
+    return title;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
-  public String getPhone() {
-    return phone;
+  public String getContent() {
+    return content;
   }
 
-  public void setPhone(String phone) {
-    this.phone = phone;
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-      "name='" + name + '\'' +
-      ", phone='" + phone + '\'' +
-      '}';
+  public void setContent(String content) {
+    this.content = content;
   }
 }

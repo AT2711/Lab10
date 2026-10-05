@@ -14,103 +14,128 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowDataActivity extends AppCompatActivity {
+
     FirebaseFirestore db;
+
     RecyclerView recyclerView;
-    List<User> users = new ArrayList<>();
-    UserViewAdapter adapter;
+
+    List<Article> articles = new ArrayList<>();
+
+    ArticleViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_show_data);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(R.id.main),
+                (v, insets) -> {
 
-        FirebaseApp firebaseApp = FirebaseApp.initializeApp(this);
+                    Insets systemBars =
+                            insets.getInsets(
+                                    WindowInsetsCompat.Type.systemBars()
+                            );
 
-        if (firebaseApp == null) {
-            Toast.makeText(this, "Firebase chưa được cấu hình", Toast.LENGTH_LONG).show();
-            return;
-        }
+                    v.setPadding(
+                            systemBars.left,
+                            systemBars.top,
+                            systemBars.right,
+                            systemBars.bottom
+                    );
+
+                    return insets;
+                }
+        );
+
+        FirebaseApp.initializeApp(this);
 
         db = FirebaseFirestore.getInstance();
 
         recyclerView = findViewById(R.id.reclyclerview);
-        adapter = new UserViewAdapter(this, users);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ArticleViewAdapter(
+                this,
+                articles
+        );
+
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(this)
+        );
+
         recyclerView.setAdapter(adapter);
 
         loadDataFromServer();
     }
 
     private void loadDataFromServer() {
-        db.collection("users")
+
+        db.collection("articles")
                 .get(Source.SERVER)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
+                .addOnSuccessListener(result -> {
 
-                        QuerySnapshot result = task.getResult();
+                    articles.clear();
 
-                        users.clear();
+                    for (QueryDocumentSnapshot document : result) {
 
-                        for (QueryDocumentSnapshot document : result) {
-                            String name = document.getString("name");
-                            String phone = document.getString("phone");
+                        String title = document.getString("title");
+                        String content = document.getString("content");
 
-                            if (name == null) {
-                                name = "";
-                            }
-
-                            if (phone == null) {
-                                phone = "";
-                            }
-
-                            users.add(new User(name, phone));
+                        if (title == null) {
+                            title = "";
                         }
 
-                        adapter.update(users);
-                        adapter.notifyDataSetChanged();
-
-                        if (users.isEmpty()) {
-                            Toast.makeText(
-                                    this,
-                                    "Firebase chưa có dữ liệu",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        } else {
-                            Toast.makeText(
-                                    this,
-                                    "Đã tải " + users.size() + " dữ liệu từ Firebase",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                        if (content == null) {
+                            content = "";
                         }
 
-                    } else {
-                        Exception e = task.getException();
+                        Article article = new Article(
+                                title,
+                                content
+                        );
 
-                        String message = e != null
-                                ? e.getMessage()
-                                : "Không thể đọc dữ liệu";
+                        articles.add(article);
+                    }
+
+                    adapter.update(articles);
+
+                    adapter.notifyDataSetChanged();
+
+                    if (articles.isEmpty()) {
 
                         Toast.makeText(
                                 this,
-                                "Lỗi Firebase: " + message,
-                                Toast.LENGTH_LONG
+                                "Firebase chưa có bài viết",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                    } else {
+
+                        Toast.makeText(
+                                this,
+                                "Đã tải "
+                                        + articles.size()
+                                        + " bài viết từ Firebase",
+                                Toast.LENGTH_SHORT
                         ).show();
                     }
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(
+                            this,
+                            "Lỗi Firebase: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
                 });
     }
 
@@ -123,4 +148,3 @@ public class ShowDataActivity extends AppCompatActivity {
         }
     }
 }
-
