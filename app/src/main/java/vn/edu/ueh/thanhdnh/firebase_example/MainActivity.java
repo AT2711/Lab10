@@ -22,28 +22,38 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
   FirebaseFirestore db;
+
   Button btAdd, btShow;
-  EditText etName, etPhone;
+
+  EditText etName, etPhone, etImgCover;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     EdgeToEdge.enable(this);
+
     setContentView(R.layout.activity_main);
 
-    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+    ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.main),
+            (v, insets) -> {
 
-      v.setPadding(
-              systemBars.left,
-              systemBars.top,
-              systemBars.right,
-              systemBars.bottom
-      );
+              Insets systemBars =
+                      insets.getInsets(
+                              WindowInsetsCompat.Type.systemBars()
+                      );
 
-      return insets;
-    });
+              v.setPadding(
+                      systemBars.left,
+                      systemBars.top,
+                      systemBars.right,
+                      systemBars.bottom
+              );
+
+              return insets;
+            }
+    );
 
     FirebaseApp.initializeApp(this);
 
@@ -54,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     etName = findViewById(R.id.etName);
     etPhone = findViewById(R.id.etPhone);
+    etImgCover = findViewById(R.id.etImgCover);
 
     btAdd.setOnClickListener(this);
     btShow.setOnClickListener(this);
@@ -64,25 +75,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     if (view.getId() == R.id.btAdd) {
 
-      String title = etName.getText().toString().trim();
-      String content = etPhone.getText().toString().trim();
+      String title =
+              etName.getText().toString().trim();
+
+      String content =
+              etPhone.getText().toString().trim();
+
+      String imgCover =
+              etImgCover.getText().toString().trim();
 
       if (title.isEmpty()) {
-        etName.setError("Vui lòng nhập tiêu đề bài viết");
+        etName.setError("Vui lòng nhập tiêu đề");
         etName.requestFocus();
         return;
       }
 
       if (content.isEmpty()) {
-        etPhone.setError("Vui lòng nhập nội dung bài viết");
+        etPhone.setError("Vui lòng nhập nội dung");
         etPhone.requestFocus();
         return;
       }
 
-      Map<String, Object> article = new HashMap<>();
+      if (imgCover.isEmpty()) {
+        etImgCover.setError("Vui lòng nhập URL ảnh");
+        etImgCover.requestFocus();
+        return;
+      }
+
+      Map<String, Object> article =
+              new HashMap<>();
 
       article.put("title", title);
       article.put("content", content);
+      article.put("img_cover", imgCover);
+      article.put("views", 0L);
 
       btAdd.setEnabled(false);
 
@@ -100,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 etName.setText("");
                 etPhone.setText("");
+                etImgCover.setText("");
               })
               .addOnFailureListener(e -> {
 
@@ -114,10 +141,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     } else if (view.getId() == R.id.btShow) {
 
-      Intent intent = new Intent(
-              MainActivity.this,
-              ShowDataActivity.class
-      );
+      Intent intent =
+              new Intent(
+                      MainActivity.this,
+                      ShowDataActivity.class
+              );
 
       startActivity(intent);
     }

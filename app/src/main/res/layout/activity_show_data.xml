@@ -5,54 +5,32 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".ShowDataActivity">
 
-  <LinearLayout
-    android:id="@+id/linearLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
-
-    <TextView
-      android:id="@+id/txt_name"
-      android:layout_width="match_parent"
+  <TextView
+      android:id="@+id/tvListTitle"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_weight="1"
-      android:background="#3F51B5"
-      android:paddingLeft="5sp"
-      android:paddingTop="5sp"
-      android:paddingBottom="5sp"
-      android:text="Name"
-      android:textColor="#FFFFFF"
-      android:textSize="18sp"
-      android:textStyle="bold" />
-
-    <TextView
-      android:id="@+id/txt_phone"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="1"
-      android:background="#3F51B5"
-      android:paddingLeft="5sp"
-      android:paddingTop="5sp"
-      android:paddingBottom="5sp"
-      android:text="Phone"
-      android:textColor="#FFFFFF"
-      android:textSize="18sp"
-      android:textStyle="bold" />
-  </LinearLayout>
+      android:text="DANH SÁCH BÀI VIẾT"
+      android:textAlignment="center"
+      android:textSize="22sp"
+      android:textStyle="bold"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
   <androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/reclyclerview"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-    app:layout_constraintVertical_bias="0.0" />
+      android:id="@+id/reclyclerview"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_marginTop="15dp"
+      android:clipToPadding="false"
+      android:paddingBottom="10dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/tvListTitle"
+      tools:listitem="@layout/contact_list" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

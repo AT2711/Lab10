@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.Source;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,8 @@ public class ShowDataActivity extends AppCompatActivity {
     List<Article> articles = new ArrayList<>();
 
     ArticleViewAdapter adapter;
+
+    ListenerRegistration listenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,90 +65,117 @@ public class ShowDataActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        recyclerView = findViewById(R.id.reclyclerview);
-
-        adapter = new ArticleViewAdapter(
-                this,
-                articles
-        );
+        recyclerView =
+                findViewById(R.id.reclyclerview);
 
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(this)
         );
 
+        adapter =
+                new ArticleViewAdapter(
+                        this,
+                        articles
+                );
+
         recyclerView.setAdapter(adapter);
 
-        loadDataFromServer();
+        listenToArticles();
     }
 
-    private void loadDataFromServer() {
+    private void listenToArticles() {
 
-        db.collection("articles")
-                .get(Source.SERVER)
-                .addOnSuccessListener(result -> {
+        listenerRegistration =
+                db.collection("articles")
+                        .addSnapshotListener(
+                                (QuerySnapshot result,
+                                 FirebaseFirestoreException error) -> {
 
-                    articles.clear();
+                                    if (error != null) {
 
-                    for (QueryDocumentSnapshot document : result) {
+                                        Toast.makeText(
+                                                this,
+                                                "Lỗi Firebase: "
+                                                        + error.getMessage(),
+                                                Toast.LENGTH_LONG
+                                        ).show();
 
-                        String title = document.getString("title");
-                        String content = document.getString("content");
+                                        return;
+                                    }
 
-                        if (title == null) {
-                            title = "";
-                        }
+                                    if (result == null) {
+                                        return;
+                                    }
 
-                        if (content == null) {
-                            content = "";
-                        }
+                                    articles.clear();
 
-                        Article article = new Article(
-                                title,
-                                content
+                                    for (QueryDocumentSnapshot document : result) {
+
+                                        String title =
+                                                document.getString("title");
+
+                                        String content =
+                                                document.getString("content");
+
+                                        String imgCover =
+                                                document.getString("img_cover");
+
+                                        Long viewsValue =
+                                                document.getLong("views");
+
+                                        if (title == null) {
+                                            title = "";
+                                        }
+
+                                        if (content == null) {
+                                            content = "";
+                                        }
+
+                                        if (imgCover == null) {
+                                            imgCover = "";
+                                        }
+
+                                        long views = 0;
+
+                                        if (viewsValue != null) {
+                                            views = viewsValue;
+                                        }
+
+                                        Article article =
+                                                new Article(
+                                                        document.getId(),
+                                                        title,
+                                                        content,
+                                                        imgCover,
+                                                        views
+                                                );
+
+                                        articles.add(article);
+                                    }
+
+                                    adapter.update(articles);
+
+                                    adapter.notifyDataSetChanged();
+
+                                    if (articles.isEmpty()) {
+
+                                        Toast.makeText(
+                                                this,
+                                                "Firebase chưa có bài viết",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                }
                         );
-
-                        articles.add(article);
-                    }
-
-                    adapter.update(articles);
-
-                    adapter.notifyDataSetChanged();
-
-                    if (articles.isEmpty()) {
-
-                        Toast.makeText(
-                                this,
-                                "Firebase chưa có bài viết",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                    } else {
-
-                        Toast.makeText(
-                                this,
-                                "Đã tải "
-                                        + articles.size()
-                                        + " bài viết từ Firebase",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-
-                    Toast.makeText(
-                            this,
-                            "Lỗi Firebase: " + e.getMessage(),
-                            Toast.LENGTH_LONG
-                    ).show();
-                });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onDestroy() {
 
-        if (db != null && adapter != null) {
-            loadDataFromServer();
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
         }
+
+        super.onDestroy();
     }
 }
